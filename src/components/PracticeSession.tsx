@@ -9,6 +9,18 @@ const roleLabel = {
   new: 'new learning'
 };
 
+const roleBadge = {
+  confidence: 'bg-amber-100 text-amber-700',
+  review: 'bg-indigo-100 text-indigo-700',
+  new: 'bg-emerald-100 text-emerald-700'
+};
+
+const roleEmoji = {
+  confidence: '💪',
+  review: '🔁',
+  new: '🌱'
+};
+
 export default function PracticeSession() {
   const user = useStore((s) => s.user);
   const initialSession = useStore((s) => s.currentSession);
@@ -71,22 +83,37 @@ export default function PracticeSession() {
               onChangeConfidence={setConfidence}
             />
             <button
-              className="rounded-2xl bg-slate-900 px-5 py-3 font-medium text-white hover:bg-slate-800"
+              className="rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-3 font-medium text-white shadow-md hover:from-indigo-600 hover:to-violet-700"
               onClick={() => setStarted(true)}
             >
-              Build Today’s Session
+              Build Today’s Session ✨
             </button>
           </div>
         ) : (
           <div>
-            <div className="rounded-2xl bg-slate-50 p-4 text-slate-700">{sessionMix.reasoning}</div>
+            <div className="flex items-start gap-3 rounded-2xl bg-indigo-50/60 p-4 text-slate-700">
+              <span className="text-xl">🧭</span>
+              {sessionMix.reasoning}
+            </div>
 
             <div className="mt-6 flex items-center justify-between">
-              <p className="text-sm text-slate-500">
-                Question {index + 1} of {sessionMix.questions.length}
-              </p>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                {roleLabel[current.role]}
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-slate-500">
+                  Question {index + 1} of {sessionMix.questions.length}
+                </p>
+                <div className="flex gap-1.5">
+                  {sessionMix.questions.map((q, i) => (
+                    <span
+                      key={q.id}
+                      className={`h-2 w-2 rounded-full ${
+                        i < index ? 'bg-indigo-500' : i === index ? 'bg-violet-400' : 'bg-slate-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <span className={`rounded-full px-3 py-1 text-sm font-medium ${roleBadge[current.role]}`}>
+                {roleEmoji[current.role]} {roleLabel[current.role]}
               </span>
             </div>
 
@@ -102,15 +129,17 @@ export default function PracticeSession() {
                     ? 'border-emerald-500 bg-emerald-50'
                     : isAnswered && picked
                       ? 'border-rose-400 bg-rose-50'
-                      : 'border-slate-200 bg-white hover:bg-slate-50';
+                      : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/40';
 
                 return (
                   <button
                     key={choice}
                     onClick={() => submitAnswer(choice)}
-                    className={`w-full rounded-2xl border p-4 text-left ${style}`}
+                    className={`w-full rounded-2xl border p-4 text-left transition ${style}`}
                   >
                     {choice}
+                    {isAnswered && correct && <span className="ml-2">✅</span>}
+                    {isAnswered && picked && !correct && <span className="ml-2">❌</span>}
                   </button>
                 );
               })}
@@ -118,7 +147,7 @@ export default function PracticeSession() {
 
             {isAnswered && (
               <div className="mt-5 rounded-2xl bg-blue-50 p-4 text-blue-950">
-                <p className="font-medium">Explanation</p>
+                <p className="font-medium">💡 Explanation</p>
                 <p className="mt-1">{current.explanation}</p>
               </div>
             )}
@@ -126,7 +155,7 @@ export default function PracticeSession() {
             <button
               disabled={!isAnswered}
               onClick={next}
-              className="mt-6 rounded-2xl bg-slate-900 px-5 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="mt-6 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-3 font-medium text-white shadow-md hover:from-indigo-600 hover:to-violet-700 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
             >
               {index === sessionMix.questions.length - 1 ? 'Complete Session' : 'Next Question'}
             </button>

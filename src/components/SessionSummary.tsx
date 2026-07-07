@@ -1,11 +1,24 @@
 import type { Level } from '../lib/engine';
 import { useStore } from '../store/useStore';
+import ProgressRing from './ProgressRing';
 
 const intentLabel = {
   rebuild: 'Rebuilding momentum',
   balanced: 'Steady progress',
   growth: 'Growth'
 };
+
+const intentEmoji = {
+  rebuild: '💪',
+  balanced: '🌱',
+  growth: '🚀'
+};
+
+const confidenceOptions: { level: Level; emoji: string; label: string }[] = [
+  { level: 'low', emoji: '😐', label: 'Okay' },
+  { level: 'medium', emoji: '🙂', label: 'Good' },
+  { level: 'high', emoji: '😄', label: 'Great' }
+];
 
 export default function SessionSummary() {
   const result = useStore((s) => s.lastResult);
@@ -40,13 +53,26 @@ export default function SessionSummary() {
   return (
     <div className="mx-auto max-w-3xl p-6">
       <section className="rounded-3xl bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-slate-500">Session Summary</p>
-        <h1 className="mt-1 text-3xl font-semibold">
-          {result.correctAnswers} of {result.questionsAnswered} correct
-        </h1>
+        <p className="text-sm font-semibold text-indigo-500">Session Summary</p>
 
-        <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-          <p className="font-medium">Today’s focus: {intentLabel[result.sessionMix.sessionIntent]}</p>
+        <div className="mt-3 flex items-center justify-between rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 p-5 text-white shadow-md">
+          <div>
+            <p className="text-sm font-medium text-orange-100">🎉 Today’s result</p>
+            <h1 className="mt-1 text-3xl font-semibold">
+              {result.correctAnswers} of {result.questionsAnswered} correct
+            </h1>
+          </div>
+          <ProgressRing
+            value={accuracyRatio * 100}
+            label={`${result.correctAnswers}/${result.questionsAnswered}`}
+            size={72}
+          />
+        </div>
+
+        <div className="mt-4 rounded-2xl bg-violet-50 p-4">
+          <p className="font-medium">
+            {intentEmoji[result.sessionMix.sessionIntent]} Today’s focus: {intentLabel[result.sessionMix.sessionIntent]}
+          </p>
           <p className="mt-1 text-slate-600">
             We adjusted today’s session mix dynamically based on readiness, confidence, and recent activity.
           </p>
@@ -57,27 +83,31 @@ export default function SessionSummary() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <FeedbackCard
+            emoji="💪"
+            tint="bg-emerald-50"
             title="Strengths"
             items={result.strengths}
             empty="Keep building — these areas will continue to strengthen with practice."
           />
           <FeedbackCard
+            emoji="🎯"
+            tint="bg-amber-50"
             title="Areas to reinforce"
             items={result.areasToReinforce}
             empty="Strong performance across this session."
           />
         </div>
 
-        <div className="mt-6 rounded-2xl border border-slate-200 p-4">
+        <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4">
           <p className="font-medium">How are you feeling about your progress now?</p>
           <div className="mt-3 flex flex-wrap gap-3">
-            {(['low', 'medium', 'high'] as Level[]).map((level) => (
+            {confidenceOptions.map(({ level, emoji, label }) => (
               <button
                 key={level}
                 onClick={() => selectConfidence(level)}
-                className="rounded-xl border border-slate-300 px-4 py-2 capitalize hover:bg-slate-50"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 hover:border-indigo-300 hover:bg-indigo-50"
               >
-                {level === 'low' ? 'Okay' : level === 'medium' ? 'Good' : 'Great'}
+                {emoji} {label}
               </button>
             ))}
           </div>
@@ -87,10 +117,24 @@ export default function SessionSummary() {
   );
 }
 
-function FeedbackCard({ title, items, empty }: { title: string; items: string[]; empty: string }) {
+function FeedbackCard({
+  emoji,
+  tint,
+  title,
+  items,
+  empty
+}: {
+  emoji: string;
+  tint: string;
+  title: string;
+  items: string[];
+  empty: string;
+}) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="font-medium">{title}</p>
+    <div className={`rounded-2xl ${tint} p-4`}>
+      <p className="font-medium">
+        {emoji} {title}
+      </p>
       {items.length ? (
         <ul className="mt-2 list-inside list-disc text-slate-700">
           {items.map((item) => (

@@ -14,8 +14,8 @@ export default function DailyCheckIn({
   onChangeConfidence
 }: Props) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <h3 className="font-semibold">Daily check-in</h3>
+    <div className="rounded-2xl bg-indigo-50/60 p-4">
+      <h3 className="font-semibold">📝 Daily check-in</h3>
       <p className="mt-1 text-sm text-slate-600">This adjusts the type of practice, not pressure.</p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Select label="How ready do you feel today?" value={readiness} onChange={onChangeReadiness} />
@@ -38,7 +38,7 @@ function Select({
     <label className="block">
       <span className="text-sm font-medium text-slate-600">{label}</span>
       <select
-        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"
+        className="mt-2 w-full rounded-xl border border-indigo-100 bg-white px-3 py-2"
         value={value}
         onChange={(e) => onChange(e.target.value as Level)}
       >
